@@ -1,0 +1,21 @@
+{
+  "account": {
+    "uuid": "00000000-0000-4000-8000-000000000001",
+    "full_name": "QuixiDesk",
+    "display_name": "QuixiDesk",
+    "email_address": "",
+    "memberships": [
+      {
+        "organization": {
+          "uuid": "00000000-0000-4000-8000-000000000001",
+          "name": "Personal workspace"
+        }
+      }
+    ],
+    "settings": {
+      "theme": "dark"
+    }
+  },
+  "current_user_access": {},
+  "featureFlagsOrgUuid": "00000000-0000-4000-8000-000000000001"
+}

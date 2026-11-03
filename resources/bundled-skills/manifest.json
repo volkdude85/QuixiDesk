@@ -1,0 +1,14 @@
+{
+  "skills": [
+    {
+      "name": "browser-driving",
+      "description": "Drive a real browser: Brave over CDP, Firefox over WebDriver BiDi, curl as the last resort.",
+      "tier": "always"
+    },
+    {
+      "name": "with",
+      "description": "Build, test and ship software in With, the self-hosting systems language, when its compiler is installed.",
+      "tier": "always"
+    }
+  ]
+}

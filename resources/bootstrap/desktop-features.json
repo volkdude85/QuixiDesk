@@ -1,0 +1,17 @@
+{
+  "chat": {
+    "status": "supported"
+  },
+  "projects": {
+    "status": "supported"
+  },
+  "artifacts": {
+    "status": "supported"
+  },
+  "providers": {
+    "status": "supported"
+  },
+  "localTools": {
+    "status": "supported"
+  }
+}

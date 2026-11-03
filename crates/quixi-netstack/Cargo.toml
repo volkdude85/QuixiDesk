@@ -1,0 +1,14 @@
+[package]
+name = "quixi-netstack"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+dirs.workspace = true
+url.workspace = true
+uuid.workspace = true
+quixi-platform.workspace = true
+quixi-proto.workspace = true

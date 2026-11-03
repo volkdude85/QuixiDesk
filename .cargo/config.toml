@@ -1,0 +1,7 @@
+# Build against the vendored registry rather than the network. A Flatpak build has no network and a
+# package build should not need one either.
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
