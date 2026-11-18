@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Letter to Eric Hartford — a review of the Charter</title>
+<meta name="description" content="A review of QuixiDesk's Charter: what holds up, what we are taking from it, and eight places we would go differently.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Letter to Eric Hartford — a review of the Charter">
+<meta property="og:description" content="A review of QuixiDesk's Charter: what holds up, what we are taking from it, and eight places we would go differently.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Letter to Eric Hartford — a review of the Charter">
+<meta name="twitter:description" content="A review of QuixiDesk's Charter: what holds up, what we are taking from it, and eight places we would go differently.">
+<style>
+:root {
+  --bg: #fbfaf7;
+  --fg: #1d1c1a;
+  --muted: #5f5c56;
+  --accent: #8a4b2a;
+  --rule: #ddd8ce;
+  --code-bg: #f0ece4;
+  --measure: 70ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16161a;
+    --fg: #e8e5df;
+    --muted: #a09c94;
+    --accent: #d99a6c;
+    --rule: #302f34;
+    --code-bg: #22222a;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Charter, "Bitstream Charter", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.72;
+}
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 4.5rem 1.4rem 6rem;
+}
+h1 {
+  font-size: 2rem;
+  line-height: 1.18;
+  letter-spacing: -.012em;
+  margin: 0 0 .55rem;
+}
+.sub {
+  color: var(--muted);
+  font-size: .95rem;
+  font-style: italic;
+  margin: 0 0 2.4rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+h2 {
+  font-size: 1.35rem;
+  line-height: 1.28;
+  margin: 2.7rem 0 .9rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--rule);
+}
+h3 {
+  font-size: 1.1rem;
+  margin: 2.2rem 0 .6rem;
+  color: var(--accent);
+}
+p, li { margin: 0 0 1.15rem; }
+ul, ol { padding-left: 1.4rem; }
+li { margin-bottom: .5rem; }
+strong { font-weight: 700; }
+em { color: var(--muted); }
+a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+blockquote {
+  margin: 1.4rem 0;
+  padding: .1rem 0 .1rem 1.1rem;
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  font-style: italic;
+}
+code {
+  font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .86em;
+  background: var(--code-bg);
+  padding: .12em .38em;
+  border-radius: 4px;
+  word-break: break-word;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1rem 1.1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  border-left: 3px solid var(--accent);
+}
+pre code { background: none; padding: 0; font-size: .84em; line-height: 1.6; }
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.8rem 0; }
+footer {
+  margin-top: 3.5rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: .85rem;
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Letter to Eric Hartford — a review of the Charter</h1>
+<p class="sub">Draft. Not sent. Written 2026-11-18.</p>
+<p>Eric,</p>
+<p>The shortest version: <strong>§4.5 of your RFC is the correct design and 1.0 doesn't implement it.</strong></p>
+<p><code>SourceRef</code> with <code>effectiveFrom</code>, <code>effectiveUntil</code>, <code>issuingAuthority</code> and <code>signaturePolicy</code> is exactly the right object — you even wrote, in the same section, <em>"Hashing does not itself grant authority."</em> What shipped is <code>Document "path" SHA256 "hex" Rank n</code>: a digest of a local file, with no issuer, no validity window, no signature, and an ordinal where a doctrine of authority belongs. §12.2 lists <code>SourceRef</code> as a migration step still to do, so I don't think you disagree with any of this. That gap is the letter. Everything below is elaboration on it, one short list of what I'm taking, and four mechanical things I'd fix this afternoon.</p>
+<p>For context on where I'm standing: I'm not a Lean person. I took business law, not engineering, and I've spent the last couple of years doing real legal work pro se — statutes, rules, dockets, agency findings, an active family case. So I read Charter as someone who spends his days asking <em>which text governs, is it current, and what follows from it</em>, rather than as someone who can check a proof. Everything below is from that side of the glass. Where I'm wrong about the semantics, say so and I'll take the correction.</p>
+<p>Full disclosure on method, since it bears on how much weight to give this: I skimmed the repo myself and didn't get much from the first page, so I handed it to Nora — the assistant I run locally — and had her work through the mission and laws, the RFC, the spec, the server, the battery, <code>AGENTS.md</code> and the PSA properly, and pull your Actions API to see the state of <code>main</code>. She did the technical reading and the verification; I did the judging. The CI findings below come from that check and are offered as information, not as a gotcha.</p>
+<hr />
+<h2 id="what-is-right-here-and-why-it-matters">What is right here, and why it matters</h2>
+<p>Four things in the mission document are, I think, the reason this design works where most rules-as-code work doesn't.</p>
+<p><strong>Law 1 — occurrence is never blocked.</strong> <em>"A program that makes a forbidden act unperformable has described a machine, not an institution."</em> That's the best sentence in the repository. Most systems in this space collapse <em>can't</em> into <em>mustn't</em>, and in doing so they delete the entire remedy structure — there's no breach to remedy and no damages to measure if the act was never possible. You kept the distinction and it's load-bearing for everything downstream.</p>
+<p><strong>Law 3 — violations are facts, findings are events.</strong> A breach is recorded when it happens; a finding is an institutional act whose effect is the declared remedies; the link between them is an assumption the program states, never a theorem the language supplies. I've watched agency findings get read as if the finding <em>were</em> the violation for two years. Nobody models this. You did, and you got the direction right.</p>
+<p><strong>Law 11 — the author never sees Lean</strong>, and you enforce it with a grep over the tool's own output rather than with good intentions. That's the difference between a principle and a claim.</p>
+<p><strong>Law 14 — the mission is tested, not described.</strong> One failing program per law. This is the most transferable single idea in the repo and I'm taking it.</p>
+<p>The three-answer ontology — occurred / lawful / valid — is the other thing I'd defend to anyone. <code>Valid when</code> separated from <code>Holds when</code>, on an <code>Act</code> that defaults to <code>Valid when True</code> so unlawful physical events still record their consequences and trigger their remedies, while a <code>Power</code> has to state its own validity condition and go void without one: that's the correct asymmetry, and it's the one every real dispute turns on. <code>ultra vires</code>, <code>void ab initio</code>, and <code>unlawful but effective</code> are three different outcomes and most tools can express one of them.</p>
+<p>The Hohfeldian <code>Immunity</code> as a first-class record with <code>Holder</code> / <code>Against</code> / <code>Holds when</code> / <code>Unless</code>, rather than an ad-hoc negated precondition, is the right level of abstraction. Immunities are how you stop a power from being exercised, and they're almost never modelled as data.</p>
+<p>And two process things worth naming:</p>
+<p><strong>The tolerance manifest.</strong> Fifty-eight of the 196 eFLINT fixtures diverge and every one of them is machine-audited in <code>tolerances.md</code> with an upstream result, your result, a root-cause decision ID, and a conformance test. Publishing your own divergence list, in that much detail, is not normal behaviour and it's the reason I trust the rest of the numbers.</p>
+<p><strong><code>AGENTS.md</code>.</strong> <em>We own every bug, nothing is pre-existing. Root cause means the exact rule, phrase, or step. A tool that stayed silent is a bug. Three-action trip-wire. Ceremony is a design defect, not an author error.</em> I have written process documents for a living and these are better than mine, because every one of them is testable.</p>
+<hr />
+<h2 id="what-im-taking-from-this-repo">What I'm taking from this repo</h2>
+<p>Being specific so it's on the record rather than inferred. Nothing is copied — there's no licence in the repo, so the default is all rights reserved, and I'm not going to lift code from it. These are ideas rather than code, and I'll credit them where they land:</p>
+<ol type="1">
+<li><strong>Law 14's shape</strong> — a failing program per policy, so a policy can't be quietly lost. I'm building the equivalent for my own operating rules.</li>
+<li><strong>Law 1 and Law 3's ontology</strong> — occurrence is never blocked, and a finding is an event with declared remedies rather than a synonym for a breach.</li>
+<li><strong>The three-answer separation</strong>, including the <code>Act</code>/<code>Power</code> default asymmetry.</li>
+<li><strong>The four claim tags</strong> — <code>proved / decided / checked / assumed</code>, never a fifth — with the grep gate that keeps <code>sorry</code> and <code>native_decide</code> out.</li>
+<li><strong>The <code>?why</code> provenance chain</strong> and the idea that every judgment returns the rule it applied and the span it came from.</li>
+<li><strong>The battery itself</strong> — the whole notion of a gate per law, run as one command, with the summary naming what passed.</li>
+<li><strong><code>AGENTS.md</code>'s process rules</strong>, especially the trip-wire and "ceremony is a design defect."</li>
+</ol>
+<p>If any of that ends up in something I publish, it'll say where it came from.</p>
+<hr />
+<h2 id="how-we-do-legal-research-now-and-the-rules-we-run-by">How we do legal research now, and the rules we run by</h2>
+<p>Since the suggestions below all come out of this, it's only fair to show the working. It isn't a tool — it's a discipline written down and enforced by an assistant that has been told not to guess. Which is precisely the problem I'm describing: the rules exist, and nothing makes them true.</p>
+<p><strong>The order.</strong> Forum and deadline before argument. Statute text before case law. Definitions before the operative section. Elements before facts. Remedy and vehicle named before the argument gets written. Out of order, you produce something that reads well and loses.</p>
+<p><strong>Which copy counts.</strong> Read at Cornell LII, cite the OLRC edition, the eCFR for regulations, CourtListener for dockets, and the court's own portal for a live case — never a secondary summary when the primary answers. A case is authority for its holding, not its dicta, and only until something overrules it.</p>
+<p><strong>Currency, every time.</strong> No date, figure, or holding from memory. The docket is re-pulled before anything is said about it, and hearing dates come out of the calendar attachments — the <code>text/calendar</code> block, <code>DTSTART</code> and <code>STATUS</code> — rather than the prose of an email, because a <code>METHOD:CANCEL</code> with <code>STATUS:CANCELLED</code> on a date everyone believed was live is the most expensive thing in a mailbox.</p>
+<p><strong>Evidence that the text says what I say it says.</strong> Every outside fact carries an inline numbered citation drawn from a ledger that only contains URLs actually fetched. Verbatim quotes are attached to each source and rejected unless the literal text appears in the fetched page. The source list is generated mechanically from the ledger rather than retyped, because retyping is where invented citations come from.</p>
+<p><strong>Honesty about absence.</strong> "I could not check" never becomes "it was never filed." No filing is asserted without the docket in hand, and when a check is blocked by a captcha or a paywall, that fact goes into the answer as the answer. When the record doesn't settle a question, it says so and stops, rather than reaching for the most dramatic branch to fill the silence.</p>
+<p><strong>Weight as well as basis.</strong> A proposition is tagged with how it is known and, separately, with what it is worth — binding, persuasive, dicta, superseded.</p>
+<p><strong>Where this is weaker than Charter.</strong> All of it is enforced by an assistant remembering instructions. Nothing fails to build when a rule is dropped. If the policy says re-pull the docket and the re-pull doesn't happen, nothing breaks and nothing shows — which is exactly the failure your Law 14 exists to prevent, and the reason I'm taking it.</p>
+<hr />
+<h2 id="what-id-suggest-you-consider-adding--or-where-id-go-differently">What I'd suggest you consider adding — or where I'd go differently</h2>
+<p>Eight points. Each one is a design suggestion rather than a bug report, and on several of them your own RFC already argues my side, which is part of why I'm writing this at all. Where I say "I'd" read it as "consider" — you know your constraints and I don't.</p>
+<h3 id="1-provenance-should-be-a-property-of-the-artifact-not-a-flag">1. Provenance should be a property of the artifact, not a flag</h3>
+<p><code>--require-provenance</code> is opt-in. A program with neither <code>Document</code> nor <code>Clause</code> is classified <code>illustrative</code> and runs normally. And spec 12.7: <em>"A document that cannot be read is a warning, not a failure, and the check is skipped."</em></p>
+<p>Three routes to a green check with zero verification performed. I'd make coverage a gate on <em>delivery</em> instead of a mode: partial provenance is fine for an author exploring, and refused by <code>charter gen</code> and <code>charter build</code>, because those are the paths that produce something another party acts on. I'd also drop <code>illustrative</code> as a state name — an ungrounded program is a grammar exercise and the tool should say that rather than give it a neutral label.</p>
+<p>Your own <code>AGENTS.md</code> says no silent fallbacks and that a tool which stayed silent is a bug. 12.7 is a silent fallback written into the spec.</p>
+<h3 id="2-the-hash-pins-the-copy-not-the-currency">2. The hash pins the copy, not the currency</h3>
+<p><code>Document "path" SHA256 "hex"</code> digests a file relative to the program. Nothing reaches the OLRC, oregonlegislature.gov, the eCFR, or a court's own docket to ask whether that file is the text currently in force.</p>
+<p>So a fully green Charter program can be a formally flawless formalization of a <strong>superseded</strong> statute: every span verbatim, every rule grounded, every hash matching, and the law moved three years ago. <code>trust.md</code> concedes the neighbouring question — whether the rule captures the meaning of the prose is human judgement, never mechanical — but currency isn't conceded, it isn't modelled.</p>
+<p>This is the gap that costs me the most in practice, because the tool would look rigorous while being wrong, which is the worst combination. I'd tie the digest to an issuer and an effective window, add a resolve-and-compare step per jurisdiction and source class, and give an unreachable source a first-class state — <code>UNVERIFIED_AS_OF &lt;date&gt;</code> — that travels with every output derived from it.</p>
+<p>Which is, near enough, <code>SourceRef</code> from §4.5, and §12.2 lists shipping it as a migration step still to do. <strong>§4.5 is the correct design and 1.0 doesn't implement it.</strong> That's the single most useful sentence I can offer you.</p>
+<h3 id="3-rules-need-effective-windows-and-judgements-should-be-as-of-a-date">3. Rules need effective windows, and judgements should be as-of a date</h3>
+<p><code>Time</code> and <code>Duration</code> over facts and duties are genuinely good — half-open expiry, <code>Held … For</code>, deadlines that breach without a synthetic lapse event. But <code>Amend</code> changes the rule set and there's no way to ask what the answer was under the rules in force in March 2023. Everything is evaluated under the current program.</p>
+<p>I'd hang an effective window on <code>Regime</code> and answer every question <strong>as of</strong> a date, defaulting to the date of the <em>event</em> rather than to now, and report which rule set was used.</p>
+<p>This isn't a feature, it's the reason legal systems have the shape they do. Ex post facto, vested rights, contracts clause, retroactivity in an operating agreement or a custody modification — all of it turns on which rules governed conduct at the time. A tool that evaluates all history under today's rules will be confidently wrong on a whole class of real questions, and the machinery for doing it properly is already in your tree.</p>
+<h3 id="4-rank-n-is-an-ordinal-not-a-doctrine-of-authority">4. <code>Rank n</code> is an ordinal, not a doctrine of authority</h3>
+<p><code>Rank 1</code> outranking <code>Rank 2</code> between otherwise-unranked cross-document <code>Default</code>/<code>Exception</code> rules is an integer the author assigns. It can't express a later statute repealing an earlier one, a regulation invalid for exceeding its statute, a case construing a phrase, holding versus dicta, or a regulation whose reading changed without a word of text changing.</p>
+<p>I'd make authority a relation with a stated reason: a source kind (constitution / statute / regulation / rule / order / judgment / agreement), an issuer, and precedence rules declared in the program as records you can point at — "this bylaw yields to that statute because the statute sits higher in the issuer's own hierarchy." §4.6 proposes <code>lib/jurisdiction.charter</code> + <code>Core/Composition</code> for exactly this, which is the right instinct. The shipped integer isn't it. The disputes that decide cases are conflicts between authorities, not orderings within one.</p>
+<h3 id="5-four-tags-describe-how-we-know-nothing-describes-how-much-its-worth">5. Four tags describe how we know; nothing describes how much it's worth</h3>
+<p><code>proved / decided / checked / assumed</code> is a good taxonomy, honestly enforced. But a <code>checked</code> verbatim quote from a dissent is checked and worthless as authority, and a <code>proved</code> theorem about <code>Law σ</code> says nothing at all about ORS 107.137.</p>
+<p>I'd add a second axis — epistemic basis × authority weight (binding / persuasive / superseded / overruled / dicta / unpublished / on appeal) — because the label answers <em>how sure are we that this is what the document says</em> when the reader's real question is <em>does this bind anyone</em>. That conflation is the most common way a legal argument dies, and it's one field on the record.</p>
+<h3 id="6-an-unresolved-fact-should-fail-a-burden-of-proof-not-abort-the-matter">6. An unresolved fact should fail a burden of proof, not abort the matter</h3>
+<p>An unassigned <code>Open</code> fact raises <code>CHR100</code> and evaluation halts. The richer <code>Evidenced</code> path with <code>Established / Refuted / Unresolved / Conflicted</code> and <code>Finding</code> exists and is tested, and it's the right direction — but a plain <code>Open</code> fact still aborts, and the richer path isn't required for a judgement to render.</p>
+<p>In an actual proceeding a missing fact doesn't stop the world. It produces a failure of proof for whoever carried the burden, and <em>that</em> is the outcome. I'd put the burden on the norm — <code>Duty … Burden preponderance On claimant</code> — require an evidence status on every <code>Open</code>/<code>Evidenced</code> premise used in a judgement, and have <code>Unresolved</code> discharge against the burden-holder instead of aborting. Aborting is a programming semantic in a legal costume, and it changes real results: it produces "we can't say" where the correct answer is "the claimant loses that element."</p>
+<h3 id="7-id-unwind-the-eflint-superset-guarantee-and-keep-the-corpus">7. I'd unwind the eFLINT superset guarantee and keep the corpus</h3>
+<p>Law 12 says Charter extends and does not revise; Law 13 says one spelling per meaning and the old one gets deleted rather than deprecated. Those two are already in tension, and the 39-entry tolerance manifest is the receipt. Fifty- eight of 196 fixtures diverge.</p>
+<p>I'd keep the corpus as a regression oracle — it's genuinely valuable and there's nothing else like it — and drop the superset as a <em>law</em>. Provide a one-way importer instead. A superset inherits every defect it lacks the standing to fix, and the tolerance list is a permanent tax on every future grammar change. You can see it biting already: §12.2 has to strip v0.3 duplication and replace reserved words with contextual keywords purely to make the superset hold. That's a lot of effort spent on compatibility with a research prototype, in a language whose ambition is to be the last one anyone needs.</p>
+<h3 id="8-commentary-as-formally-inert-is-where-interpretation-goes-to-die">8. <code>Commentary</code> as formally inert is where interpretation goes to die</h3>
+<p>Five registers, and only four have formal consequences; <code>Commentary</code> has no target. But recitals, preambles, whereases, and purpose clauses are where a court goes to decide what the operative text means.</p>
+<p>I'd give purpose a register with a bounded, declared use: admissible for construction, inadmissible for creating a duty, and citable by a rule as a construction aid with that edge recorded on the rule so the reliance is visible. A model that files purpose as inert reproduces, systematically, the failure mode of plain-meaning-only analysis — it will read every ambiguous operative clause against the drafter's intent, because it threw the intent away at parse time.</p>
+<hr />
+<h2 id="the-mechanical-things-id-fix-first">The mechanical things I'd fix first</h2>
+<p>In order, because these are the cheapest and they're the ones a stranger hits first.</p>
+<ol type="1">
+<li><p><strong>There is no LICENSE file.</strong> Default is all rights reserved. For a language whose second goal is to be universal, that's the largest adoption blocker in the repo and it's five minutes.</p></li>
+<li><p><strong><code>main</code> is red, and has been for every run.</strong> All eight Actions runs failed. <code>lake build</code> succeeds across 209 jobs; 22 of 23 battery gates pass — 196/196 eFLINT corpus, 213/213 spec conformance, 14/14 stdlib, 5/5 <code>prove</code>, 18/18 <code>verify</code>, 13/13 <code>server</code>, 64 claims verified. Then <code>projections</code> returns <code>7 passed, 1 failed, 8 total</code>.</p></li>
+<li><p><strong>The battery doesn't say which case failed.</strong> The summary line reports the count and nothing else, and the individual case output isn't in the log. I couldn't tell you which of the eight it was without building it. A summary that says <code>1 failed</code> is the tool staying silent about the one thing the reader needs — which is the exact failure <code>AGENTS.md</code> says is a bug.</p></li>
+<li><p><strong>The differential suite has never run in CI.</strong> It's a separate step gated behind the failing battery step, so solc, Foundry, Quint, and Z3 have not executed once. I'd split it into its own workflow immediately, so that a projection defect can't mask "the Solidity target doesn't compile."</p></li>
+</ol>
+<p>None of that is a design problem. It's an afternoon.</p>
+<hr />
+<h2 id="last-thing">Last thing</h2>
+<p>The order of the two goals is what makes this credible, and I don't think it's an accident that you wrote the precedence rule down. Formalize the protocol first, generalize second — so the language's constructs were forced to exist by something real rather than designed in the abstract. That's the opposite of how most DSLs get built, and it's why the ontology holds up.</p>
+<p>I'd like to keep the correspondence going if you're up for it. I'm building something adjacent from the other end — not a formal language, more a way of keeping an agent's legal work honest about where each fact came from and how much it's worth — and I think the two would have things to say to each other.</p>
+<p>Either way: thank you for writing the design documents down. Most people don't, and then the reasoning is lost.</p>
+<p>volkdude85</p>
+<hr />
+<p><em>Notes for me before this goes anywhere: no licence in the repo, so this is a review, not a contribution — don't send patches unless he asks. The CI facts came from the Actions API on 2026-11-18 against head de90413f; re-check them before sending, in case he's fixed it since. Nothing personal belongs in here: no case number, no names, no family. If it goes out it goes out as written.</em></p>
+<footer>Published as a static page from <a href="https://github.com/volkdude85/QuixiDesk">volkdude85/QuixiDesk</a> · <a href="https://github.com/volkdude85/QuixiDesk/blob/main/LETTER-TO-ERIC.md">source markdown</a></footer>
+</main>
+</body>
+</html>
